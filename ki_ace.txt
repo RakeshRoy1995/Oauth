@@ -1,0 +1,78 @@
+Instalization
+
+{1.composer require laravel/passport
+2.php artisan migrate
+3.php artisan passport:install
+4.App\User model = use Laravel\Passport\HasApiTokens;
+5.app/Provider/AuthServiceProvider =Passport::routes();
+6.config/auth.php =
+'api' => [
+        'driver' => 'passport',
+        'provider' => 'users',
+    ],
+}
+
+Frontend Quickstart
+
+{
+	1.php artisan vendor:publish --tag=passport-components
+  2.resources/js/app.js =
+  Vue.component(
+    'passport-clients',
+    require('./components/passport/Clients.vue').default
+);
+
+Vue.component(
+    'passport-authorized-clients',
+    require('./components/passport/AuthorizedClients.vue').default
+);
+
+Vue.component(
+    'passport-personal-access-tokens',
+    require('./components/passport/PersonalAccessTokens.vue').default
+);
+
+3. run = npm install on cmd
+4. home.blade and npm run watch on cmd
+5.make personal/client token
+
+}
+
+Requesting Tokens
+{
+	1. make a route like = <a href="{{ route('get.token') }}">Get Token</a> on client site on other different laravel page
+then-> web.php
+	Route::get('/redirect', function () {
+    $query = http_build_query([
+        'client_id' => '4',
+        'redirect_uri' => 'http://rakesh.com/callback',
+        'response_type' => 'code',
+        'scope' => '',
+    ]);
+
+    return redirect('http://localhost:8000/oauth/authorize?'.$query);
+});
+
+}
+
+Approving The Request on client site{
+	
+	web.php->
+	Route::get('/callback', function (Request $request) {
+    $http = new GuzzleHttp\Client;
+
+    $response = $http->post('http://your-app.com/oauth/token', [
+        'form_params' => [
+            'grant_type' => 'authorization_code',
+            'client_id' => 'client-id',
+            'client_secret' => 'client-secret',
+            'redirect_uri' => 'http://example.com/callback',
+            'code' => $request->code,
+        ],
+    ]);
+
+    return json_decode((string) $response->getBody(), true);
+});
+
+composer require guzzlehttp/guzzle
+}
